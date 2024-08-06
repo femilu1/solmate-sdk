@@ -91,7 +91,7 @@ class SolMateAPIClient:
     def check_uri(self, auth_token, device_id):
         """Handles redirections using verification of uri and dummy request gaining redirection info"""
         if not self.uri_verified:
-            print("Verifiying uri")
+            print("Verifiying uri..")
             try:
                 data = self.request(
                     "authenticate",
@@ -101,13 +101,13 @@ class SolMateAPIClient:
                         "device_id": device_id,
                     },
                 )
-                print(data)
                 if not data["redirect"] in (self.uri, None):
-                    print("Redirected - switching to new uri - uri of SolMate changed retry whatever you have done")
+                    print(f"Redirected - switching to {data['redirect']} - uri of SolMate changed retry whatever you have done")
                     self.uri = data["redirect"]
-                    print("New uri", self.uri)
+                    print("Finished switching - New uri:", self.uri)
                     self.uri_verified = True
                 else:
+                    print("Uri verified - no redirection")
                     self.uri_verified = True
             except BadRequest as err:
                 raise ValueError("Invalid Serial Number?") from err
@@ -151,7 +151,7 @@ class SolMateAPIClient:
             print(f"Stored credentials of {self.serialnum}.")
             print(f"Already stored credentials are: ", [sn for sn in authstore.keys()])
         if not self.uri_verified:
-            print("uri nor verified yet - checking uri for redirection - SolMate might be on a different port")
+            print("Uri nor verified yet - checking uri for redirection - SolMate might be on a different port")
             self.check_uri(token, device_id)
             self.connect()  # Connect to redirection address
         self.authenticate(token, device_id)
@@ -166,7 +166,7 @@ class SolMateAPIClient:
         """Return current live values of the respective SolMate as a dictionary (pv power, battery state, injection)."""
         return self.request("live_values", {})
 
-    def get_recent_logs(self, days=None, start_time=None):
+    def get_recent_logs(self, days=None, start_time=None, resolution=4):
         """Returns the latest logs on the sol server"""
         import datetime
 
@@ -177,7 +177,7 @@ class SolMateAPIClient:
         end_time = start_time + datetime.timedelta(days)
         return self.request(
             "logs",
-            {"timeframes": [{"start": start_time.isoformat()[:19], "end": end_time.isoformat()[:19], "resolution": 4}]},
+            {"timeframes": [{"start": start_time.isoformat()[:19], "end": end_time.isoformat()[:19], "resolution": resolution if resolution <= 4 else 4}]},
         )
 
     def get_milestones_savings(self, days=1):

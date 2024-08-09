@@ -16,7 +16,9 @@ For any inquiries about, or problems with, the usage of this API endpoint, pleas
 
 Install the package via:
 
-`pip install solmate-sdk`
+`pip install solmate-sdk` (original)
+
+`pip install https://github.com/femilu1/solmate-sdk/archive/master.tar.gz` or <br>`pip install git+https://github.com/femilu1/solmate-sdk.git` (this fork) \[based on version 0.1.10\]
 
 Import the `SolMateAPIClient` class and connect to your SolMate:
 
